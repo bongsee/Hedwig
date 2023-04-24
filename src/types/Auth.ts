@@ -26,6 +26,11 @@ export interface AuthResponse {
     message: string
 }
 
+// verify userPayload
+export interface userPayload {
+    content: AuthUser
+}
+
 // {
 //     "content": {
 //       "id": 22,

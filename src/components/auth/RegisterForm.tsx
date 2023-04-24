@@ -2,13 +2,15 @@ import React, { useRef } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import TextField from '@mui/material/TextField'
 import CustomButton from '../CustomButton'
-import { login, register } from '@/apis/Auth'
-import { useMutation } from 'react-query'
-import { useRouter } from 'next/router'
-import { setCookie } from '@/utils/cookies'
+import { UseMutateFunction } from 'react-query'
+import { AuthResponse, SignUpRequest } from '@/types/Auth'
+import { AxiosError } from 'axios'
 
 interface RegisterForm {
     [key: string]: string
+}
+interface RegisterFormProps {
+    mutate: UseMutateFunction<AuthResponse, AxiosError, SignUpRequest>
 }
 
 const defaultValues: RegisterForm = {
@@ -18,7 +20,7 @@ const defaultValues: RegisterForm = {
     password_check: '',
 }
 
-function RegisterForm() {
+function RegisterForm({ mutate: register }: RegisterFormProps) {
     const {
         handleSubmit,
         formState: { errors },
@@ -28,24 +30,6 @@ function RegisterForm() {
 
     const passwordRef = useRef('')
     passwordRef.current = watch('password')
-
-    const router = useRouter()
-
-    const { mutate: registerMutate, isLoading } = useMutation(register, {
-        onSuccess: (data) => {
-            console.log('회원가입 성공!')
-            // 쿠키 설정
-            setCookie('accessToken', data.accessToken, { path: '/', maxAge: data.content.exp - data.content.iat })
-            // 성공 시 login 페이지로 이동
-            router.push({
-                pathname: '/auth/login',
-                query: { authLogin: true },
-            })
-        },
-        onError: (err) => {
-            console.log(`에러는 무엇인가요 ? : ${err}`)
-        },
-    })
 
     const onSubmitForm = (data: RegisterForm) => {
         // request data에서 password_check 항목 제거
@@ -57,10 +41,9 @@ function RegisterForm() {
         )
         console.log(reqData)
         // register api 호출
-        registerMutate(reqData)
+        register(reqData)
     }
 
-    if (isLoading) return <>loading...</>
     return (
         <form
             onSubmit={handleSubmit(onSubmitForm, () => {

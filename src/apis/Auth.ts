@@ -1,4 +1,4 @@
-import { SignInRequest, SignUpRequest, AuthResponse } from '@/types/Auth'
+import { SignInRequest, SignUpRequest, AuthResponse, userPayload } from '@/types/Auth'
 import { axiosInstance } from './axios'
 
 export const register = async (signUpData: SignUpRequest) => {
@@ -8,5 +8,10 @@ export const register = async (signUpData: SignUpRequest) => {
 
 export const login = async (signInData: SignInRequest) => {
     const { data } = await axiosInstance.post<AuthResponse>('/login', signInData)
+    return data
+}
+
+export const verify = async () => {
+    const { data } = await axiosInstance.get<userPayload>('/verify')
     return data
 }

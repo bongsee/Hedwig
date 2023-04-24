@@ -3,9 +3,26 @@
 
 import { Box, Container } from '@mui/material'
 import RegisterForm from '@/components/auth/RegisterForm'
+import { register } from '@/apis/Auth'
+import { useMutation } from 'react-query'
+import { setCookie } from '@/utils/cookies'
+import { AxiosError } from 'axios'
+import { useRouter } from 'next/router'
 // import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 
 function RegisterPage() {
+    const router = useRouter()
+    const { mutate, isLoading } = useMutation(register, {
+        onSuccess: (data) => {
+            setCookie('accessToken', data.accessToken, { path: '/', maxAge: data.content.exp - data.content.iat })
+            router.push('/post')
+        },
+        onError: (err: AxiosError) => {
+            console.log(`로그인 에러: ${err}`)
+        },
+    })
+
+    if (isLoading) return <>loading...</>
     return (
         <Container maxWidth="sm" sx={{ border: 1, display: 'flex', justifyContent: 'center' }}>
             {/* 뒤로가기 IconButton */}
@@ -19,7 +36,7 @@ function RegisterPage() {
                 }}
             >
                 <p>계정을 생성하세요.</p>
-                <RegisterForm />
+                <RegisterForm mutate={mutate} />
             </Box>
         </Container>
     )
