@@ -13,10 +13,11 @@ import ChatBubbleOutline from '@mui/icons-material/ChatBubbleOutline'
 import { timeSince } from '../timeSince'
 import CustomCard from '../customCard'
 
-import { useState } from 'react'
+import { MouseEvent, useState } from 'react'
 import { Post } from '@/types/Post'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { getPost, likePost } from '@/apis/Post'
+import { queryKeys } from '@/constants/queryKey'
 
 /**
  * @example 
@@ -63,6 +64,17 @@ function PostCard({ userName, content, createdAt, updatedAt, id, img, likesCount
     const timeStamp = propCreatedAt === propUpdatedAt ? timeSince(propCreatedAt) + ' 작성됨' : timeSince(propUpdatedAt) + ' 수정됨'
 
     const queryClient = useQueryClient()
+    const { mutate } = useMutation(likePost, {
+        onSuccess: () => {
+            queryClient.invalidateQueries(queryKeys.post.allPosts)
+        },
+    })
+    const onClickLike = (e: MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation()
+        setLiked((prev) => !prev)
+        mutate(id)
+        setCurLikesCount(liked ? curLikesCount - 1 : curLikesCount + 1)
+    }
 
     const isDetailPost = false
     const profileImg = '/default.png'
@@ -99,15 +111,7 @@ function PostCard({ userName, content, createdAt, updatedAt, id, img, likesCount
                     <Typography>{commentsCount}</Typography>
                 </Box>
                 <Box mr={'0.6em'} sx={{ display: 'flex', position: 'relative' }}>
-                    <IconButton
-                        sx={{ padding: '0', mr: '0.4em' }}
-                        onClick={(e) => {
-                            e.stopPropagation()
-                            setLiked((prev) => !prev)
-                            likePost(id)
-                            setCurLikesCount(liked ? curLikesCount - 1 : curLikesCount + 1)
-                        }}
-                    >
+                    <IconButton sx={{ padding: '0', mr: '0.4em' }} onClick={onClickLike}>
                         {liked ? <Favorite sx={{ color: 'red' }} /> : <FavoriteBorder />}
                     </IconButton>
                     <Typography>{curLikesCount}</Typography>

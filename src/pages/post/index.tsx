@@ -79,9 +79,13 @@ const Post = () => {
     const [dialogState, setDialogState] = useState(false)
     const [loadingVisible, setLoadingVisible] = useState(false)
 
+    // 내가 쓴 글 필터링
     let myPost = null
     if (value === 'my') {
         myPost = allPost?.filter((post: Post) => post.userName === currentUser)
+    }
+    if (value === 'liked') {
+        myPost = allPost?.filter((post: Post) => post.isLiked === true)
     }
     const selectedPost = myPost || allPost
 
@@ -155,9 +159,9 @@ const Post = () => {
                 <Tab value="my" label="My" sx={tabStyles} />
             </Tabs>
             <div className="CardContainer" style={{ width: '100%' }} ref={cardContainerRef}>
-                <div style={{ textAlign: 'center' }}>
+                {/* <div style={{ textAlign: 'center' }}>
                     <CircularProgress />
-                </div>
+                </div> */}
                 <div
                     onTouchStart={handleTouchStart}
                     onTouchEnd={handleTouchEnd}
