@@ -16,7 +16,7 @@ export const getPost = async (id: number) => {
 }
 
 export const getPosts = async () => {
-    const response = await axiosInstance.get('/post')
+    const response = await axiosInstance.get<Post[]>('/post')
     return response.data
 }
 

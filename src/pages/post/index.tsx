@@ -70,7 +70,6 @@ const navStyles = {
 const Post = () => {
     // 토큰에 들어있는 암호 정보속에 userName을 가져올수 있다면....    }
     const { data: allPost, isLoading } = useQuery(queryKeys.post.allPosts, getPosts)
-
     const { data: userdata } = useQuery('userdata', verify)
     const currentUser = userdata?.content.username
 
@@ -79,6 +78,12 @@ const Post = () => {
     const [drawerState, setDrawerState] = useState(false)
     const [dialogState, setDialogState] = useState(false)
     const [loadingVisible, setLoadingVisible] = useState(false)
+
+    let myPost = null
+    if (value === 'my') {
+        myPost = allPost?.filter((post: Post) => post.userName === currentUser)
+    }
+    const selectedPost = myPost || allPost
 
     const cardContainerRef = useRef<HTMLDivElement>(null)
 
@@ -166,8 +171,8 @@ const Post = () => {
                         paddingBottom: '75px',
                     }}
                 >
-                    {allPost &&
-                        allPost.map((post: Post) => {
+                    {selectedPost &&
+                        selectedPost.map((post: Post) => {
                             /** 동일한 유저가 좋아요 했다는것을 어떻게 파악할까  */
                             // loginUser 가 post에 있는 userName과 같은가?
 
